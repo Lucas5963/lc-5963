@@ -1,0 +1,90 @@
+/* Resetando margens e padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+section {
+    padding: 20px;
+    margin: 20px 0;
+    background-color: white;
+    border-radius: 8px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+}
+/* Estilo para os Botões */
+button {
+    background-color: #4CAF50; /* Cor de fundo */
+    color: white;              /* Cor do texto */
+    border: none;              /* Remover borda */
+    padding: 10px 20px;        /* Espaçamento interno */
+    font-size: 16px;           /* Tamanho da fonte */
+    cursor: pointer;          /* Cursor de mão */
+    border-radius: 5px;        /* Bordas arredondadas */
+    transition: background-color 0.3s ease; /* Efeito de transição */
+}
+
+button:hover {
+    background-color: #45a049; /* Cor do botão ao passar o mouse */
+}
+/* Estilo para a Lista de Tópicos */
+ul {
+    list-style-type: none;     /* Remove os marcadores da lista */
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;            /* Espaçamento entre os itens */
+}
+
+ul li a {
+    text-decoration: none;     /* Remove o sublinhado dos links */
+    color: #333;               /* Cor do texto do link */
+    font-size: 18px;
+    padding: 5px;
+    transition: color 0.3s ease; /* Efeito de transição */
+}
+
+ul li a:hover {
+    color: #4CAF50;            /* Cor do link ao passar o mouse */
+}
+/* Estilo para os Botões */
+button {
+    background-color: #4CAF50; /* Cor de fundo */
+    color: white;              /* Cor do texto */
+    border: none;              /* Remover borda */
+    padding: 10px 20px;        /* Espaçamento interno */
+    font-size: 16px;           /* Tamanho da fonte */
+    cursor: pointer;          /* Cursor de mão */
+    border-radius: 5px;        /* Bordas arredondadas */
+    transition: background-color 0.3s ease; /* Efeito de transição */
+}
+
+button:hover {
+    background-color: #45a049; /* Cor do botão ao passar o mouse */
+}
+
