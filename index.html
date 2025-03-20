@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aperte Aqui</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <style>
         /* Estilos CSS diretamente no HTML */
         body {
@@ -14,19 +15,88 @@
             align-items: center; /* Centraliza verticalmente */
             background-color: #f0f0f0; /* Cor de fundo clara */
         }
+
         .botao-grande {
-            width: 200px; /* Largura do botão */
-            height: 200px; /* Altura do botão, formando um quadrado */
-            background-color: #008000; /* Verde, cor do Fluminense */
-            color: white; /* Texto branco */
-            font-size: 24px; /* Tamanho da fonte */
-            font-family: Arial, sans-serif; /* Fonte simples */
-            border: none; /* Sem borda */
-            cursor: pointer; /* Mãozinha ao passar o mouse */
-            text-align: center; /* Centraliza o texto */
+            width: 200px; /* Mantém a largura quadrada */
+            height: 200px; /* Mantém a altura quadrada */
+            display: inline-flex;
+            font-family: 'Nunito', sans-serif;
+            font-size: 24px; /* Seu tamanho de fonte original */
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1.3px;
+            font-weight: 700;
+            color: white; /* Mantém texto branco */
+            background: linear-gradient(90deg, #008000 0%, #006600 100%); /* Gradiente com suas cores verdes */
+            border: none;
+            border-radius: 1000px; /* Faz um círculo perfeito */
+            box-shadow: 12px 12px 24px rgba(0, 102, 0, 0.64); /* Sombra com tom verde */
+            transition: all 0.3s ease-in-out 0s;
+            cursor: pointer;
+            outline: none;
+            position: relative;
         }
-        .botao-grande:hover {
-            background-color: #006600; /* Escurece ao passar o mouse */
+
+        .botao-grande::before {
+            content: '';
+            border-radius: 1000px;
+            width: calc(200px + 12px); /* Ajustado para o tamanho do botão */
+            height: calc(200px + 12px); /* Ajustado para o tamanho do botão */
+            border: 6px solid #00FFCB;
+            box-shadow: 0 0 60px rgba(0, 255, 203, 0.64);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: all 0.3s ease-in-out 0s;
+        }
+
+        .botao-grande:hover,
+        .botao-grande:focus {
+            color: white; /* Mantém o texto branco */
+            transform: translateY(-6px); /* Efeito de elevação */
+            background: linear-gradient(90deg, #006600 0%, #004d00 100%); /* Escurece no hover */
+        }
+
+        .botao-grande:hover::before,
+        .botao-grande:focus::before {
+            opacity: 1; /* Mostra o anel externo ao passar o mouse */
+        }
+
+        .botao-grande::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border-radius: 100%;
+            border: 6px solid #00FFCB;
+            position: absolute;
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ring 1.5s infinite;
+        }
+
+        .botao-grande:hover::after,
+        .botao-grande:focus::after {
+            animation: none;
+            display: none;
+        }
+
+        @keyframes ring {
+            0% {
+                width: 30px;
+                height: 30px;
+                opacity: 1;
+            }
+            100% {
+                width: 200px; /* Ajustado para o tamanho do botão */
+                height: 200px;
+                opacity: 0;
+            }
         }
     </style>
 </head>
