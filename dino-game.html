@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Dinossauro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        h1 {
+            color: #006600;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 6px solid #00FFCB;
+            border-radius: 10px;
+            box-shadow: 12px 12px 24px rgba(0, 102, 0, 0.64);
+            background-color: white;
+        }
+
+        .botao-voltar {
+            margin-top: 20px;
+            width: 150px;
+            height: 50px;
+            display: inline-flex;
+            font-family: 'Nunito', sans-serif;
+            font-size: 18px;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1.3px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(90deg, #008000 0%, #006600 100%);
+            border: none;
+            border-radius: 1000px;
+            box-shadow: 12px 12px 24px rgba(0, 102, 0, 0.64);
+            transition: all 0.3s ease-in-out 0s;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .botao-voltar:hover,
+        .botao-voltar:focus {
+            color: white;
+            transform: translateY(-6px);
+            background: linear-gradient(90deg, #006600 0%, #004d00 100%);
+        }
+
+        .botao-voltar::before {
+            content: '';
+            border-radius: 1000px;
+            width: calc(150px + 12px);
+            height: calc(50px + 12px);
+            border: 6px solid #00FFCB;
+            box-shadow: 0 0 60px rgba(0, 255, 203, 0.64);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: all 0.3s ease-in-out 0s;
+        }
+
+        .botao-voltar:hover::before,
+        .botao-voltar:focus::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo do Dinossauro</h1>
+    <canvas id="gameCanvas" width="600" height="200"></canvas>
+    <a href="index.html" class="botao-voltar">Voltar</a>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let dino = { x: 50, y: 150, width: 20, height: 20, dy: 0, gravity: 0.5, jump: -10 };
+        let obstacles = [];
+        let frame = 0;
+        let score = 0;
+        let gameOver = false;
+
+        function drawDino() {
+            ctx.fillStyle = "#006600"; // Verde escuro para o dinossauro
+            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+        }
+
+        function createObstacle() {
+            obstacles.push({ x: 600, y: 170, width: 20, height: 20 });
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = "#008000"; // Verde claro para os obstáculos
+            for (let obs of obstacles) {
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                obs.x -= 2;
+            }
+        }
+
+        function update() {
+            if (gameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            dino.dy += dino.gravity;
+            dino.y += dino.dy;
+            if (dino.y > 150) {
+                dino.y = 150;
+                dino.dy = 0;
+            }
+
+            if (frame % 100 === 0) createObstacle();
+
+            drawDino();
+            drawObstacles();
+
+            for (let obs of obstacles) {
+                if (dino.x < obs.x + obs.width && dino.x + dino.width > obs.x &&
+                    dino.y < obs.y + obs.height && dino.y + dino.height > obs.y) {
+                    gameOver = true;
+                    alert("Fim de jogo! Pontuação: " + score);
+                }
+            }
+
+            frame++;
+            score = Math.floor(frame / 10);
+            ctx.fillStyle = "#006600";
+            ctx.font = "18px Nunito";
+            ctx.fillText("Pontuação: " + score, 500, 20);
+
+            requestAnimationFrame(update);
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && dino.y === 150) {
+                dino.dy = dino.jump;
+            }
+        });
+
+        update();
+    </script>
+</body>
+</html>
