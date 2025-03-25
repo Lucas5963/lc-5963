@@ -7,13 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
+        margin: 0;
             height: 100vh;
             display: flex;
-            flex-direction: column; /* Mudado para column para empilhar os botões */
-            justify-content: center;
-            align-items: center;
+            flex-direction: row; /* Mudado de column para row */
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center; /* Centraliza verticalmente */
             background-color: #f0f0f0;
+            flex-wrap: wrap; /* Permite que os botões quebrem linha se não couberem */
+            gap: 20px; /* Espaçamento entre os botões */
         }
 
         .botao-grande {
@@ -102,7 +104,9 @@
     </style>
 </head>
 <body>
-    <button class="botao-grande" onclick="window.location.href='https://youtube.com/shorts/J2Zv9OFSA8U?si=jXkfPahYlUDjo_wP'">Aperte Aqui André</button>
+    <button class="botao-grande" onclick="window.location.href='https://youtube.com/shorts/J2Zv9OFSA8U?si=jXkfPahYlUDjo_wP'">Aperte Aqui</button>
     <button class="botao-grande" onclick="window.location.href='dino-game.html'">Jogar Dinossauro</button>
+     <button class="botao-grande" onclick="window.location.href='https://www.youtube.com/'">Aperte Aqui</button>
+    <button class="botao-grande" onclick="window.location.href='https://lucas5963.github.io/site-LC/'">Site cadastro</button>
 </body>
 </html>
