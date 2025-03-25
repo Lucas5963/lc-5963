@@ -6,44 +6,45 @@
     <title>Aperte Aqui</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos CSS diretamente no HTML */
         body {
             margin: 0;
-            height: 100vh; /* Altura total da tela */
+            height: 100vh;
             display: flex;
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: center; /* Centraliza verticalmente */
-            background-color: #f0f0f0; /* Cor de fundo clara */
+            flex-direction: column; /* Mudado para column para empilhar os botões */
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
         }
 
         .botao-grande {
-            width: 200px; /* Mantém a largura quadrada */
-            height: 200px; /* Mantém a altura quadrada */
+            width: 200px;
+            height: 200px;
             display: inline-flex;
             font-family: 'Nunito', sans-serif;
-            font-size: 24px; /* Seu tamanho de fonte original */
+            font-size: 24px;
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
             text-align: center;
             letter-spacing: 1.3px;
             font-weight: 700;
-            color: white; /* Mantém texto branco */
-            background: linear-gradient(90deg, #008000 0%, #006600 100%); /* Gradiente com suas cores verdes */
+            color: white;
+            background: linear-gradient(90deg, #008000 0%, #006600 100%);
             border: none;
-            border-radius: 1000px; /* Faz um círculo perfeito */
-            box-shadow: 12px 12px 24px rgba(0, 102, 0, 0.64); /* Sombra com tom verde */
+            border-radius: 1000px;
+            box-shadow: 12px 12px 24px rgba(0, 102, 0, 0.64);
             transition: all 0.3s ease-in-out 0s;
             cursor: pointer;
             outline: none;
             position: relative;
+            margin: 20px; /* Espaçamento entre os botões */
         }
 
         .botao-grande::before {
             content: '';
             border-radius: 1000px;
-            width: calc(200px + 12px); /* Ajustado para o tamanho do botão */
-            height: calc(200px + 12px); /* Ajustado para o tamanho do botão */
+            width: calc(200px + 12px);
+            height: calc(200px + 12px);
             border: 6px solid #00FFCB;
             box-shadow: 0 0 60px rgba(0, 255, 203, 0.64);
             position: absolute;
@@ -56,14 +57,14 @@
 
         .botao-grande:hover,
         .botao-grande:focus {
-            color: white; /* Mantém o texto branco */
-            transform: translateY(-6px); /* Efeito de elevação */
-            background: linear-gradient(90deg, #006600 0%, #004d00 100%); /* Escurece no hover */
+            color: white;
+            transform: translateY(-6px);
+            background: linear-gradient(90deg, #006600 0%, #004d00 100%);
         }
 
         .botao-grande:hover::before,
         .botao-grande:focus::before {
-            opacity: 1; /* Mostra o anel externo ao passar o mouse */
+            opacity: 1;
         }
 
         .botao-grande::after {
@@ -93,7 +94,7 @@
                 opacity: 1;
             }
             100% {
-                width: 200px; /* Ajustado para o tamanho do botão */
+                width: 200px;
                 height: 200px;
                 opacity: 0;
             }
@@ -102,5 +103,6 @@
 </head>
 <body>
     <button class="botao-grande" onclick="window.location.href='https://youtube.com/shorts/J2Zv9OFSA8U?si=jXkfPahYlUDjo_wP'">Aperte Aqui André</button>
+    <button class="botao-grande" onclick="window.location.href='dino-game.html'">Jogar Dinossauro</button>
 </body>
 </html>
