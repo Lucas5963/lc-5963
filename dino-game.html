@@ -85,27 +85,35 @@
 <body>
     <h1>Jogo do Pássaro</h1>
     <canvas id="gameCanvas"></canvas>
+    <button class="botao-grande" id="restartButton" style="display: none;" onclick="resetGame()">Reiniciar</button>
+    <audio id="backgroundMusic" loop>
+        <source src="https://raw.githubusercontent.com/Lucas5963/lc-5963/main/background-music.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
+        const restartButton = document.getElementById("restartButton");
+        const backgroundMusic = document.getElementById("backgroundMusic");
         canvas.width = Math.min(window.innerWidth - 40, 1200);
         canvas.height = 400;
         const ctx = canvas.getContext("2d");
 
         let bird = { x: 50, y: 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -10 };
         let birdImage = new Image();
-        birdImage.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh7dLJPi0-mdXh9INIxIqOZJZmhmJLXq5bkA&s"; // Substitua pelo caminho da sua imagem do pássaro
+        birdImage.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh7dLJPi0-mdXh9INIxIqOZJZmhmJLXq5bkA&s";
 
         let cloudImage = new Image();
-        cloudImage.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlBUWFdNT0ZgR5yTNkxmzAc86Vr-HsRg61OlT-lTfKRgw9ZlhyZGgRQ0k&s=10"; // Substitua pelo caminho da sua imagem de nuvem
+        cloudImage.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlBUWFdNT0ZgR5yTNkxmzAc86Vr-HsRg61OlT-lTfKRgw9ZlhyZGgRQ0k&s=10";
 
         let obstacles = [];
         let frame = 0;
         let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
         let gameOver = false;
 
-        const jumpSound = new Audio("sound");  // Caminho para o som de pulo
-        const crashSound = new Audio("crash-sound.mp3"); // Caminho para o som de colisão
+        const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
+        const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
 
         function resetGame() {
             bird = { x: 50, y: 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -10 };
@@ -113,6 +121,9 @@
             frame = 0;
             score = 0;
             gameOver = false;
+            restartButton.style.display = "none";
+            backgroundMusic.currentTime = 0; // Reinicia a música
+            backgroundMusic.play(); // Toca a música ao reiniciar
             update();
         }
 
@@ -128,7 +139,7 @@
         function drawObstacles() {
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
-                ctx.drawImage(cloudImage, obs.x, obs.y, obs.width, obs.height);  // Desenha a imagem da nuvem
+                ctx.drawImage(cloudImage, obs.x, obs.y, obs.width, obs.height);
                 obs.x -= obs.speed;
                 if (obs.x + obs.width < 0) obstacles.splice(i, 1);
             }
@@ -136,10 +147,10 @@
 
         function checkCollision() {
             for (let obs of obstacles) {
-                const distX = (bird.x + bird.width / 2) - (obs.x + obs.width / 2);
-                const distY = (bird.y + bird.height / 2) - (obs.y + obs.height / 2);
-                const distance = Math.sqrt(distX * distX + distY * distY);
-                if (distance < (bird.width / 2 + obs.width / 2)) {
+                if (bird.x < obs.x + obs.width &&
+                    bird.x + bird.width > obs.x &&
+                    bird.y < obs.y + obs.height &&
+                    bird.y + bird.height > obs.y) {
                     crashSound.play();
                     return true;
                 }
@@ -149,9 +160,18 @@
 
         function update() {
             if (gameOver) {
-                resetGame();
+                ctx.fillStyle = "red";
+                ctx.font = "48px Nunito";
+                ctx.textAlign = "center";
+                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = "24px Nunito";
+                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
+                restartButton.style.display = "inline-flex";
+                backgroundMusic.pause(); // Pausa a música no Game Over
                 return;
             }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             bird.dy += bird.gravity;
@@ -162,6 +182,10 @@
                 bird.dy = 0;
                 gameOver = true;
                 crashSound.play();
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);
+                }
             }
 
             if (bird.y < 0) bird.y = 0;
@@ -174,6 +198,10 @@
             if (checkCollision()) {
                 gameOver = true;
                 crashSound.play();
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);
+                }
             }
 
             frame++;
@@ -183,6 +211,7 @@
             ctx.font = "24px Nunito";
             ctx.textAlign = "center";
             ctx.fillText("Pontuação: " + score, canvas.width / 2, 30);
+            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 60);
 
             requestAnimationFrame(update);
         }
@@ -204,8 +233,16 @@
 
         birdImage.onload = function() {
             cloudImage.onload = function() {
+                backgroundMusic.play(); // Toca a música ao carregar as imagens e iniciar o jogo
                 update();
             };
+        };
+
+        birdImage.onerror = () => {
+            console.log("Imagem do pássaro não carregou");
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
+            update();
         };
     </script>
 </body>
