@@ -3,19 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aperte Aqui</title>
+    <title>Menu de Jogos</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
-        margin: 0;
+            margin: 0;
             height: 100vh;
             display: flex;
-            flex-direction: row; /* Mudado de column para row */
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: center; /* Centraliza verticalmente */
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
             background-color: #f0f0f0;
-            flex-wrap: wrap; /* Permite que os botões quebrem linha se não couberem */
-            gap: 20px; /* Espaçamento entre os botões */
+            flex-wrap: wrap;
+            gap: 20px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        h1 {
+            width: 100%;
+            text-align: center;
+            color: #006600;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            font-weight: 700;
+            margin: 20px 0;
         }
 
         .botao-grande {
@@ -39,7 +51,7 @@
             cursor: pointer;
             outline: none;
             position: relative;
-            margin: 20px; /* Espaçamento entre os botões */
+            margin: 10px;
         }
 
         .botao-grande::before {
@@ -90,23 +102,22 @@
         }
 
         @keyframes ring {
-            0% {
-                width: 30px;
-                height: 30px;
-                opacity: 1;
-            }
-            100% {
-                width: 200px;
-                height: 200px;
-                opacity: 0;
-            }
+            0% { width: 30px; height: 30px; opacity: 1; }
+            100% { width: 200px; height: 200px; opacity: 0; }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            .botao-grande { width: 150px; height: 150px; font-size: 20px; }
+            .botao-grande::before { width: calc(150px + 12px); height: calc(150px + 12px); }
         }
     </style>
 </head>
 <body>
-    <button class="botao-grande" onclick="window.location.href='https://raw.githubusercontent.com/Lucas5963/lc-5963/refs/heads/main/jogo-astronauta.html">Astronauta</button>
-    <button class="botao-grande" onclick="window.location.href='dino-game.html'">Jogo Passaro</button>
-     <button class="botao-grande" onclick="window.location.href='https://www.youtube.com/'">Aperte Aqui</button>
-    <button class="botao-grande" onclick="window.location.href='https://lucas5963.github.io/site-LC/'">Site cadastro</button>
+    <h1>Escolha um Jogo</h1>
+    <button class="botao-grande" onclick="window.location.href='jogo-astronauta.html'">Astronauta</button>
+    <button class="botao-grande" onclick="window.location.href='jogo-passaro.html'">Pássaro</button>
+    <button class="botao-grande" onclick="window.location.href='https://www.youtube.com/'">Aperte Aqui</button>
+    <button class="botao-grande" onclick="window.location.href='https://lucas5963.github.io/site-LC/'">Site Cadastro</button>
 </body>
 </html>
