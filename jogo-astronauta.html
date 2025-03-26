@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Astronauta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #1a1a2e; 
+            font-family: 'Nunito', sans-serif; 
+        }
+        h1 { 
+            color: #e94560; 
+            font-size: 36px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.3px; 
+            font-weight: 700; 
+            margin-bottom: 20px; 
+        }
+        canvas { 
+            border: 6px solid #0f3460; 
+            border-radius: 10px; 
+            box-shadow: 12px 12px 24px rgba(233, 69, 96, 0.64); 
+            background-color: #16213e; 
+            margin-bottom: 20px; 
+        }
+        .botao-grande { 
+            width: 200px; 
+            height: 200px; 
+            display: inline-flex; 
+            font-family: 'Nunito', sans-serif; 
+            font-size: 24px; 
+            align-items: center; 
+            justify-content: center; 
+            text-transform: uppercase; 
+            text-align: center; 
+            letter-spacing: 1.3px; 
+            font-weight: 700; 
+            color: white; 
+            background: linear-gradient(90deg, #e94560 0%, #0f3460 100%); 
+            border: none; 
+            border-radius: 1000px; 
+            box-shadow: 12px 12px 24px rgba(233, 69, 96, 0.64); 
+            transition: all 0.3s ease-in-out 0s; 
+            cursor: pointer; 
+            outline: none; 
+            position: relative; 
+        }
+        .botao-grande::before { 
+            content: ''; 
+            border-radius: 1000px; 
+            width: calc(200px + 12px); 
+            height: calc(200px + 12px); 
+            border: 6px solid #e94560; 
+            box-shadow: 0 0 60px rgba(233, 69, 96, 0.64); 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            opacity: 0; 
+            transition: all 0.3s ease-in-out 0s; 
+        }
+        .botao-grande:hover, .botao-grande:focus { 
+            color: white; 
+            transform: translateY(-6px); 
+            background: linear-gradient(90deg, #0f3460 0%, #e94560 100%); 
+        }
+        .botao-grande:hover::before, .botao-grande:focus::before { 
+            opacity: 1; 
+        }
+        .botao-grande::after { 
+            content: ''; 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 100%; 
+            border: 6px solid #e94560; 
+            position: absolute; 
+            z-index: -1; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            animation: ring 1.5s infinite; 
+        }
+        .botao-grande:hover::after, .botao-grande:focus::after { 
+            animation: none; 
+            display: none; 
+        }
+        @keyframes ring { 
+            0% { width: 30px; height: 30px; opacity: 1; } 
+            100% { width: 200px; height: 200px; opacity: 0; } 
+        }
+        @media (max-width: 600px) {
+            canvas { border: 4px solid #0f3460; box-shadow: 6px 6px 12px rgba(233, 69, 96, 0.64); }
+            h1 { font-size: 24px; margin-bottom: 10px; }
+            .botao-grande { width: 150px; height: 150px; font-size: 20px; }
+            .botao-grande::before { width: calc(150px + 12px); height: calc(150px + 12px); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo do Astronauta</h1>
+    <canvas id="gameCanvas"></canvas>
+    <button class="botao-grande" id="restartButton" style="display: none;" onclick="resetGame()">Reiniciar</button>
+    <audio id="backgroundMusic" loop>
+        <source src="https://raw.githubusercontent.com/Lucas5963/lc-5963/main/background-music.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const restartButton = document.getElementById("restartButton");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        canvas.width = Math.min(window.innerWidth - 40, 1200);
+        canvas.height = 400;
+        const ctx = canvas.getContext("2d");
+
+        let astronaut = { x: 50, y: 100, width: 50, height: 50, dy: 0, gravity: 0.4, jump: -12 };
+        let astronautImage = new Image();
+        astronautImage.src = "https://cdn-icons-png.flaticon.com/512/804/804981.png"; // Imagem de astronauta
+
+        let meteorImage = new Image();
+        meteorImage.src = "https://cdn-icons-png.flaticon.com/512/1087/1087028.png"; // Imagem de meteoro
+
+        let obstacles = [];
+        let frame = 0;
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+        let gameOver = false;
+
+        const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
+        const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
+
+        function resetGame() {
+            astronaut = { x: 50, y: 100, width: 50, height: 50, dy: 0, gravity: 0.4, jump: -12 };
+            obstacles = [];
+            frame = 0;
+            score = 0;
+            gameOver = false;
+            restartButton.style.display = "none";
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play();
+            update();
+        }
+
+        function drawAstronaut() {
+            ctx.drawImage(astronautImage, astronaut.x, astronaut.y, astronaut.width, astronaut.height);
+        }
+
+        function createObstacle() {
+            let obstacleSpeed = 2.5 + (score / 100);
+            obstacles.push({ x: canvas.width, y: Math.random() * (canvas.height - 60), width: 60, height: 60, speed: obstacleSpeed });
+        }
+
+        function drawObstacles() {
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                ctx.drawImage(meteorImage, obs.x, obs.y, obs.width, obs.height);
+                obs.x -= obs.speed;
+                if (obs.x + obs.width < 0) obstacles.splice(i, 1);
+            }
+        }
+
+        function checkCollision() {
+            for (let obs of obstacles) {
+                if (astronaut.x < obs.x + obs.width &&
+                    astronaut.x + astronaut.width > obs.x &&
+                    astronaut.y < obs.y + obs.height &&
+                    astronaut.y + astronaut.height > obs.y) {
+                    crashSound.play();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function update() {
+            if (gameOver) {
+                ctx.fillStyle = "#e94560";
+                ctx.font = "48px Nunito";
+                ctx.textAlign = "center";
+                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = "24px Nunito";
+                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
+                restartButton.style.display = "inline-flex";
+                backgroundMusic.pause();
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            astronaut.dy += astronaut.gravity;
+            astronaut.y += astronaut.dy;
+
+            if (astronaut.y + astronaut.height > canvas.height) {
+                astronaut.y = canvas.height - astronaut.height;
+                astronaut.dy = 0;
+                gameOver = true;
+                crashSound.play();
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);
+                }
+            }
+
+            if (astronaut.y < 0) astronaut.y = 0;
+
+            if (frame % 80 === 0) createObstacle();
+
+            drawAstronaut();
+            drawObstacles();
+
+            if (checkCollision()) {
+                gameOver = true;
+                crashSound.play();
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);
+                }
+            }
+
+            frame++;
+            score = Math.floor(frame / 10);
+
+            ctx.fillStyle = "#e94560";
+            ctx.font = "24px Nunito";
+            ctx.textAlign = "center";
+            ctx.fillText("Pontuação: " + score, canvas.width / 2, 30);
+            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 60);
+
+            requestAnimationFrame(update);
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && !gameOver) {
+                astronaut.dy = astronaut.jump;
+                jumpSound.play();
+            }
+        });
+
+        document.addEventListener("touchstart", (e) => {
+            if (!gameOver) {
+                astronaut.dy = astronaut.jump;
+                jumpSound.play();
+            }
+            e.preventDefault();
+        });
+
+        astronautImage.onload = function() {
+            meteorImage.onload = function() {
+                backgroundMusic.play();
+                update();
+            };
+        };
+
+        astronautImage.onerror = () => {
+            console.log("Imagem do astronauta não carregou");
+            ctx.fillStyle = "white";
+            ctx.fillRect(astronaut.x, astronaut.y, astronaut.width, astronaut.height);
+            update();
+        };
+    </script>
+</body>
+</html>
