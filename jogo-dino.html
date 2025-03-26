@@ -25,10 +25,9 @@
             margin-bottom: 20px; 
         }
         canvas { 
-            border: 6px solid #999999; 
-            border-radius: 10px; 
-            box-shadow: 12px 12px 24px rgba(51, 51, 51, 0.64); 
+            border: none; /* Remover borda */
             margin-bottom: 20px; 
+            background-color: #ffffff; /* Cor de fundo do canvas branco */
         }
         .botao-grande { 
             width: 200px; 
@@ -96,7 +95,7 @@
             100% { width: 200px; height: 200px; opacity: 0; } 
         }
         @media (max-width: 600px) {
-            canvas { border: 4px solid #999999; box-shadow: 6px 6px 12px rgba(51, 51, 51, 0.64); }
+            canvas { box-shadow: 6px 6px 12px rgba(51, 51, 51, 0.64); }
             h1 { font-size: 24px; margin-bottom: 10px; }
             .botao-grande { width: 150px; height: 150px; font-size: 20px; }
             .botao-grande::before { width: calc(150px + 12px); height: calc(150px + 12px); }
@@ -122,13 +121,13 @@
 
         let dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
         let dinoImage = new Image();
-        dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Imagem do dinossauro
+        dinoImage.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjB5gbcYeKGLnsmABkguXvvsF8xBvnRFyb9A&s"; // Imagem do dinossauro
 
         let cactusImage = new Image();
-        cactusImage.src = "https://cdn-icons-png.flaticon.com/512/1992/1992196.png"; // Imagem do cacto
+        cactusImage.src = "https://mineblocks.com/1/wiki/images/1/1e/TNT.png"; // Imagem do cacto
 
         let cloudImage = new Image();
-        cloudImage.src = "https://cdn-icons-png.flaticon.com/512/414/414927.png"; // Imagem de nuvem
+        cloudImage.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRaYKX66V6CsiIcdO0EtliG6Y1XtVaX2qGxA&s"; // Imagem de nuvem
 
         let obstacles = [];
         let clouds = [];
@@ -136,7 +135,6 @@
         let score = 0;
         let highScore = localStorage.getItem("highScore") || 0;
         let gameOver = false;
-        let dayNightCycle = 0; // Controla o ciclo dia/noite (0 a 1)
 
         const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
         const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
@@ -147,7 +145,6 @@
             clouds = [];
             frame = 0;
             score = 0;
-            dayNightCycle = 0;
             gameOver = false;
             restartButton.style.display = "none";
             backgroundMusic.currentTime = 0;
@@ -197,108 +194,6 @@
                 }
             }
             return false;
-        }
-
-        function updateBackground() {
-            dayNightCycle += 0.001;
-            if (dayNightCycle > 2) dayNightCycle = 0;
-            let brightness = dayNightCycle <= 1 ? 1 - dayNightCycle : dayNightCycle - 1;
-            let colorValue = Math.floor(255 * brightness);
-            canvas.style.backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
-        }
-
-        function update() {
-            if (gameOver) {
-                ctx.fillStyle = "#ff0000";
-                ctx.font = "48px Nunito";
-                ctx.textAlign = "center";
-                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
-                ctx.font = "24px Nunito";
-                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
-                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
-  dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Imagem do dinossauro
-
-        let cactusImage = new Image();
-        cactusImage.src = "https://cdn-icons-png.flaticon.com/512/1992/1992196.png"; // Imagem do cacto
-
-        let cloudImage = new Image();
-        cloudImage.src = "https://cdn-icons-png.flaticon.com/512/414/414927.png"; // Imagem de nuvem
-
-        let obstacles = [];
-        let clouds = [];
-        let frame = 0;
-        let score = 0;
-        let highScore = localStorage.getItem("highScore") || 0;
-        let gameOver = false;
-        let dayNightCycle = 0; // Controla o ciclo dia/noite (0 a 1)
-
-        const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
-        const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
-
-        function resetGame() {
-            dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
-            obstacles = [];
-            clouds = [];
-            frame = 0;
-            score = 0;
-            dayNightCycle = 0;
-            gameOver = false;
-            restartButton.style.display = "none";
-            backgroundMusic.currentTime = 0;
-            backgroundMusic.play();
-            update();
-        }
-
-        function drawDino() {
-            ctx.drawImage(dinoImage, dino.x, dino.y, dino.width, dino.height);
-        }
-
-        function createObstacle() {
-            let obstacleSpeed = 3 + (score / 100);
-            obstacles.push({ x: canvas.width, y: canvas.height - 60, width: 40, height: 60, speed: obstacleSpeed });
-        }
-
-        function createCloud() {
-            clouds.push({ x: canvas.width, y: Math.random() * 100 + 50, width: 80, height: 40, speed: 1 });
-        }
-
-        function drawObstacles() {
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obs = obstacles[i];
-                ctx.drawImage(cactusImage, obs.x, obs.y, obs.width, obs.height);
-                obs.x -= obs.speed;
-                if (obs.x + obs.width < 0) obstacles.splice(i, 1);
-            }
-        }
-
-        function drawClouds() {
-            for (let i = clouds.length - 1; i >= 0; i--) {
-                const cloud = clouds[i];
-                ctx.drawImage(cloudImage, cloud.x, cloud.y, cloud.width, cloud.height);
-                cloud.x -= cloud.speed;
-                if (cloud.x + cloud.width < 0) clouds.splice(i, 1);
-            }
-        }
-
-        function checkCollision() {
-            for (let obs of obstacles) {
-                if (dino.x < obs.x + obs.width &&
-                    dino.x + dino.width > obs.x &&
-                    dino.y < obs.y + obs.height &&
-                    dino.y + dino.height > obs.y) {
-                    crashSound.play();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function updateBackground() {
-            dayNightCycle += 0.001;
-            if (dayNightCycle > 2) dayNightCycle = 0;
-            let brightness = dayNightCycle <= 1 ? 1 - dayNightCycle : dayNightCycle - 1;
-            let colorValue = Math.floor(255 * brightness);
-            canvas.style.backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
         }
 
         function update() {
@@ -317,7 +212,8 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            updateBackground();
+            // A cor de fundo sempre será branca
+            canvas.style.backgroundColor = "#ffffff";
 
             ctx.fillStyle = "#999999";
             ctx.fillRect(0, canvas.height - 50, canvas.width, 2);
