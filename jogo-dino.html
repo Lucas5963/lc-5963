@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Dino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #f0f0f0; 
+            font-family: 'Nunito', sans-serif; 
+        }
+        h1 { 
+            color: #333333; 
+            font-size: 36px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.3px; 
+            font-weight: 700; 
+            margin-bottom: 20px; 
+        }
+        canvas { 
+            border: 6px solid #999999; 
+            border-radius: 10px; 
+            box-shadow: 12px 12px 24px rgba(51, 51, 51, 0.64); 
+            background-color: #ffffff; 
+            margin-bottom: 20px; 
+        }
+        .botao-grande { 
+            width: 200px; 
+            height: 200px; 
+            display: inline-flex; 
+            font-family: 'Nunito', sans-serif; 
+            font-size: 24px; 
+            align-items: center; 
+            justify-content: center; 
+            text-transform: uppercase; 
+            text-align: center; 
+            letter-spacing: 1.3px; 
+            font-weight: 700; 
+            color: white; 
+            background: linear-gradient(90deg, #666666 0%, #333333 100%); 
+            border: none; 
+            border-radius: 1000px; 
+            box-shadow: 12px 12px 24px rgba(51, 51, 51, 0.64); 
+            transition: all 0.3s ease-in-out 0s; 
+            cursor: pointer; 
+            outline: none; 
+            position: relative; 
+        }
+        .botao-grande::before { 
+            content: ''; 
+            border-radius: 1000px; 
+            width: calc(200px + 12px); 
+            height: calc(200px + 12px); 
+            border: 6px solid #999999; 
+            box-shadow: 0 0 60px rgba(153, 153, 153, 0.64); 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            opacity: 0; 
+            transition: all 0.3s ease-in-out 0s; 
+        }
+        .botao-grande:hover, .botao-grande:focus { 
+            color: white; 
+            transform: translateY(-6px); 
+            background: linear-gradient(90deg, #333333 0%, #1a1a1a 100%); 
+        }
+        .botao-grande:hover::before, .botao-grande:focus::before { 
+            opacity: 1; 
+        }
+        .botao-grande::after { 
+            content: ''; 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 100%; 
+            border: 6px solid #999999; 
+            position: absolute; 
+            z-index: -1; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            animation: ring 1.5s infinite; 
+        }
+        .botao-grande:hover::after, .botao-grande:focus::after { 
+            animation: none; 
+            display: none; 
+        }
+        @keyframes ring { 
+            0% { width: 30px; height: 30px; opacity: 1; } 
+            100% { width: 200px; height: 200px; opacity: 0; } 
+        }
+        @media (max-width: 600px) {
+            canvas { border: 4px solid #999999; box-shadow: 6px 6px 12px rgba(51, 51, 51, 0.64); }
+            h1 { font-size: 24px; margin-bottom: 10px; }
+            .botao-grande { width: 150px; height: 150px; font-size: 20px; }
+            .botao-grande::before { width: calc(150px + 12px); height: calc(150px + 12px); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo do Dino</h1>
+    <canvas id="gameCanvas"></canvas>
+    <button class="botao-grande" id="restartButton" style="display: none;" onclick="resetGame()">Reiniciar</button>
+    <audio id="backgroundMusic" loop>
+        <source src="https://raw.githubusercontent.com/Lucas5963/lc-5963/main/background-music.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const restartButton = document.getElementById("restartButton");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        canvas.width = Math.min(window.innerWidth - 40, 1200);
+        canvas.height = 400;
+        const ctx = canvas.getContext("2d");
+
+        let dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
+        let dinoImage = new Image();
+a href="jogo-passaro.html">Jogo Passaro</button>
+    <button class="botao-grande" onclick="window.location.href='https://wwwadeliveryado.com/'">Aperte Aqui</button>
+    <button class="botao-grande" onclick="window.location.href='https://lucas5963.github.io/site-LC/'">Site cadastro</button>
+dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Imagem do dinossauro
+
+        let cactusImage = new Image();
+        cactusImage.src = "https://cdn-icons-png.flaticon.com/512/1992/1992196.png"; // Imagem do cacto
+
+        let obstacles = [];
+        let frame = 0;
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+        let gameOver = false;
+
+        const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
+        const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
+
+        function resetGame() {
+            dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
+            obstacles = [];
+            frame = 0;
+            score = 0;
+            gameOver = false;
+            restartButton.style.display = "none";
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play();
+            update();
+        }
+
+        function drawDino() {
+            ctx.drawImage(dinoImage, dino.x, dino.y, dino.width, dino.height);
+        }
+
+        function createObstacle() {
+            let obstacleSpeed = 3 + (score / 100);
+            obstacles.push({ x: canvas.width, y: canvas.height - 60, width: 40, height: 60, speed: obstacleSpeed });
+        }
+
+        function drawObstacles() {
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                ctx.drawImage(cactusImage, obs.x, obs.y, obs.width, obs.height);
+                obs.x -= obs.speed;
+                if (obs.x + obs.width < 0) obstacles.splice(i, 1);
+            }
+        }
+
+        function checkCollision() {
+            for (let obs of obstacles) {
+                if (dino.x < obs.x + obs.width &&
+                    dino.x + dino.width > obs.x &&
+                    dino.y < obs.y + obs.height &&
+                    dino.y + dino.height > obs.y) {
+                    crashSound.play();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function update() {
+            if (gameOver) {
+                ctx.fillStyle = "#ff0000";
+                ctx.font = "48px Nunito";
+                ctx.textAlign = "center";
+                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = "24px Nunito";
+                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
+                restartButton.style.display = "inline-flex";
+                backgroundMusic.pause();
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Linha do chão
+            ctx.fillStyle = "#999999";
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 2);
+
+            if (dino.y < canvas.height - dino.height) {
+                dino.dy += dino.gravity;
+                dino.onGround = false;
+            } else {
+                dino.y = canvas.height - dino.height;
+                dino.dy = 0;
+                dino.onGround = true;
+            }
+            dino.y += dino.dy;
+
+            if (frame % 80 === 0) createObstacle();
+
+            drawDino();
+            drawObstacles();
+
+            if (checkCollision()) {
+                gameOver = true;
+                crashSound.play();
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);
+                }
+            }
+
+            frame++;
+            score = Math.floor(frame / 10);
+
+            ctx.fillStyle = "#333333";
+            ctx.font = "24px Nunito";
+            ctx.textAlign = "center";
+            ctx.fillText("Pontuação: " + score, canvas.width / 2, 30);
+            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 60);
+
+            requestAnimationFrame(update);
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && dino.onGround && !gameOver) {
+                dino.dy = dino.jump;
+                jumpSound.play();
+            }
+        });
+
+        document.addEventListener("touchstart", (e) => {
+            if (dino.onGround && !gameOver) {
+                dino.dy = dino.jump;
+                jumpSound.play();
+            }
+            e.preventDefault();
+        });
+
+        dinoImage.onload = function() {
+            cactusImage.onload = function() {
+                backgroundMusic.play();
+                update();
+            };
+        };
+
+        dinoImage.onerror = () => {
+            console.log("Imagem do dino não carregou");
+            ctx.fillStyle = "green";
+            ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+            update();
+        };
+    </script>
+</body>
+</html>
