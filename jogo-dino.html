@@ -28,7 +28,6 @@
             border: 6px solid #999999; 
             border-radius: 10px; 
             box-shadow: 12px 12px 24px rgba(51, 51, 51, 0.64); 
-            background-color: #ffffff; 
             margin-bottom: 20px; 
         }
         .botao-grande { 
@@ -123,19 +122,21 @@
 
         let dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
         let dinoImage = new Image();
-a href="jogo-passaro.html">Jogo Passaro</button>
-    <button class="botao-grande" onclick="window.location.href='https://wwwadeliveryado.com/'">Aperte Aqui</button>
-    <button class="botao-grande" onclick="window.location.href='https://lucas5963.github.io/site-LC/'">Site cadastro</button>
-dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Imagem do dinossauro
+        dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Imagem do dinossauro
 
         let cactusImage = new Image();
         cactusImage.src = "https://cdn-icons-png.flaticon.com/512/1992/1992196.png"; // Imagem do cacto
 
+        let cloudImage = new Image();
+        cloudImage.src = "https://cdn-icons-png.flaticon.com/512/414/414927.png"; // Imagem de nuvem
+
         let obstacles = [];
+        let clouds = [];
         let frame = 0;
         let score = 0;
         let highScore = localStorage.getItem("highScore") || 0;
         let gameOver = false;
+        let dayNightCycle = 0; // Controla o ciclo dia/noite (0 a 1)
 
         const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
         const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
@@ -143,8 +144,10 @@ dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Im
         function resetGame() {
             dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
             obstacles = [];
+            clouds = [];
             frame = 0;
             score = 0;
+            dayNightCycle = 0;
             gameOver = false;
             restartButton.style.display = "none";
             backgroundMusic.currentTime = 0;
@@ -161,12 +164,25 @@ dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Im
             obstacles.push({ x: canvas.width, y: canvas.height - 60, width: 40, height: 60, speed: obstacleSpeed });
         }
 
+        function createCloud() {
+            clouds.push({ x: canvas.width, y: Math.random() * 100 + 50, width: 80, height: 40, speed: 1 });
+        }
+
         function drawObstacles() {
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
                 ctx.drawImage(cactusImage, obs.x, obs.y, obs.width, obs.height);
                 obs.x -= obs.speed;
                 if (obs.x + obs.width < 0) obstacles.splice(i, 1);
+            }
+        }
+
+        function drawClouds() {
+            for (let i = clouds.length - 1; i >= 0; i--) {
+                const cloud = clouds[i];
+                ctx.drawImage(cloudImage, cloud.x, cloud.y, cloud.width, cloud.height);
+                cloud.x -= cloud.speed;
+                if (cloud.x + cloud.width < 0) clouds.splice(i, 1);
             }
         }
 
@@ -181,6 +197,16 @@ dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Im
                 }
             }
             return false;
+        }
+
+        function updateBackground() {
+            // Ciclo dia/noite: 0 (dia) a 1 (noite) e volta
+            dayNightCycle += 0.001; // Velocidade do ciclo
+            if (dayNightCycle > 2) dayNightCycle = 0; // Reseta após ida e volta
+
+            let brightness = dayNightCycle <= 1 ? 1 - dayNightCycle : dayNightCycle - 1;
+            let colorValue = Math.floor(255 * brightness);
+            canvas.style.backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
         }
 
         function update() {
@@ -199,6 +225,9 @@ dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Im
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Atualiza o fundo (dia/noite)
+            updateBackground();
+
             // Linha do chão
             ctx.fillStyle = "#999999";
             ctx.fillRect(0, canvas.height - 50, canvas.width, 2);
@@ -214,7 +243,9 @@ dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Im
             dino.y += dino.dy;
 
             if (frame % 80 === 0) createObstacle();
+            if (frame % 200 === 0) createCloud(); // Nuvens aparecem menos frequentemente
 
+            drawClouds();
             drawDino();
             drawObstacles();
 
@@ -256,8 +287,10 @@ dinoImage.src = "https://cdn-icons-png.flaticon.com/512/2919/2919598.png"; // Im
 
         dinoImage.onload = function() {
             cactusImage.onload = function() {
-                backgroundMusic.play();
-                update();
+                cloudImage.onload = function() {
+                    backgroundMusic.play();
+                    update();
+                };
             };
         };
 
