@@ -6,99 +6,70 @@
     <title>Jogo do Dino</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            background-color: #f0f0f0; 
-            font-family: 'Nunito', sans-serif; 
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
         }
-        h1 { 
-            color: #333333; 
-            font-size: 36px; 
-            text-transform: uppercase; 
-            letter-spacing: 1.3px; 
-            font-weight: 700; 
-            margin-bottom: 20px; 
+
+        h1 {
+            color: #333333;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            font-weight: 700;
+            margin-bottom: 20px;
         }
-        canvas { 
-            border: none; /* Remover borda */
-            margin-bottom: 20px; 
-            background-color: #ffffff; /* Cor de fundo do canvas branco */
+
+        canvas {
+            display: block; /* Para eliminar qualquer espaço indesejado */
+            background-color: #ffffff;
         }
-        .botao-grande { 
-            width: 200px; 
-            height: 200px; 
-            display: inline-flex; 
-            font-family: 'Nunito', sans-serif; 
-            font-size: 24px; 
-            align-items: center; 
-            justify-content: center; 
-            text-transform: uppercase; 
-            text-align: center; 
-            letter-spacing: 1.3px; 
-            font-weight: 700; 
-            color: white; 
-            background: linear-gradient(90deg, #666666 0%, #333333 100%); 
-            border: none; 
-            border-radius: 1000px; 
-            box-shadow: 12px 12px 24px rgba(51, 51, 51, 0.64); 
-            transition: all 0.3s ease-in-out 0s; 
-            cursor: pointer; 
-            outline: none; 
-            position: relative; 
+
+        .botao-grande {
+            width: 200px;
+            height: 200px;
+            display: inline-flex;
+            font-family: 'Nunito', sans-serif;
+            font-size: 24px;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1.3px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(90deg, #666666 0%, #333333 100%);
+            border: none;
+            border-radius: 1000px;
+            box-shadow: 12px 12px 24px rgba(51, 51, 51, 0.64);
+            transition: all 0.3s ease-in-out 0s;
+            cursor: pointer;
+            outline: none;
+            position: relative;
         }
-        .botao-grande::before { 
-            content: ''; 
-            border-radius: 1000px; 
-            width: calc(200px + 12px); 
-            height: calc(200px + 12px); 
-            border: 6px solid #999999; 
-            box-shadow: 0 0 60px rgba(153, 153, 153, 0.64); 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            opacity: 0; 
-            transition: all 0.3s ease-in-out 0s; 
-        }
-        .botao-grande:hover, .botao-grande:focus { 
-            color: white; 
-            transform: translateY(-6px); 
-            background: linear-gradient(90deg, #333333 0%, #1a1a1a 100%); 
-        }
-        .botao-grande:hover::before, .botao-grande:focus::before { 
-            opacity: 1; 
-        }
-        .botao-grande::after { 
-            content: ''; 
-            width: 30px; 
-            height: 30px; 
-            border-radius: 100%; 
-            border: 6px solid #999999; 
-            position: absolute; 
-            z-index: -1; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            animation: ring 1.5s infinite; 
-        }
-        .botao-grande:hover::after, .botao-grande:focus::after { 
-            animation: none; 
-            display: none; 
-        }
-        @keyframes ring { 
-            0% { width: 30px; height: 30px; opacity: 1; } 
-            100% { width: 200px; height: 200px; opacity: 0; } 
-        }
+
         @media (max-width: 600px) {
-            canvas { box-shadow: 6px 6px 12px rgba(51, 51, 51, 0.64); }
-            h1 { font-size: 24px; margin-bottom: 10px; }
-            .botao-grande { width: 150px; height: 150px; font-size: 20px; }
-            .botao-grande::before { width: calc(150px + 12px); height: calc(150px + 12px); }
+            canvas {
+                box-shadow: 6px 6px 12px rgba(51, 51, 51, 0.64);
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .botao-grande {
+                width: 150px;
+                height: 150px;
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -115,19 +86,22 @@
         const canvas = document.getElementById("gameCanvas");
         const restartButton = document.getElementById("restartButton");
         const backgroundMusic = document.getElementById("backgroundMusic");
-        canvas.width = Math.min(window.innerWidth - 40, 1200);
-        canvas.height = 400;
+        
+        // Atualizando o tamanho do canvas para ocupar toda a tela
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
         const ctx = canvas.getContext("2d");
 
-        let dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
+        let dino = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
         let dinoImage = new Image();
         dinoImage.src = "https://cdn-icons-png.flaticon.com/128/14448/14448602.png"; // Imagem do dinossauro
 
         let cactusImage = new Image();
-        cactusImage.src = "https://cdn-icons-png.flaticon.com/128/16232/16232294.png"; // Imagem do cacto
+        cactusImage.src = "https://media.istockphoto.com/id/2182088033/pt/vetorial/ghost-icon.jpg?s=1024x1024&w=is&k=20&c=On4zXpB1AN_2yyNQGUmOAHZJPKZz8u-Sy2ZZHb0HeFU="; // Imagem do cacto
 
         let cloudImage = new Image();
-        cloudImage.src = "https://cdn-icons-png.flaticon.com/128/14456/14456365.png"; // Imagem de nuvem
+        cloudImage.src = "https://cdn-icons-png.flaticon.com/128/3989/3989725.png"; // Imagem de nuvem
 
         let obstacles = [];
         let clouds = [];
@@ -140,7 +114,7 @@
         const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
 
         function resetGame() {
-            dino = { x: 50, y: 300, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
+            dino = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
             obstacles = [];
             clouds = [];
             frame = 0;
