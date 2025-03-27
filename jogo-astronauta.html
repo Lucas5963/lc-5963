@@ -163,11 +163,11 @@
                 const obs = obstacles[i];
                 
                 // Adiciona um efeito neon ao redor do meteoro
-                ctx.shadowBlur = 15; // Intensidade do brilho
-                ctx.shadowColor = "#00ffcc"; // Cor neon (turquesa brilhante, ajustável)
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "#00ffcc";
                 ctx.drawImage(meteorImage, obs.x, obs.y, obs.width, obs.height);
                 
-                // Reseta a sombra para não afetar outros desenhos
+                // Reseta a sombra
                 ctx.shadowBlur = 0;
                 ctx.shadowColor = "transparent";
                 
