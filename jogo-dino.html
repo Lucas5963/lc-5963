@@ -31,7 +31,6 @@
             display: block;
             background-color: #ffffff;
             border: 2px solid #333333;
-            /* Alteração 1: Garantir que o canvas não exceda a largura da tela */
             max-width: 100%;
             height: auto;
         }
@@ -91,12 +90,16 @@
         const restartButton = document.getElementById("restartButton");
         const backgroundMusic = document.getElementById("backgroundMusic");
         
-        // Alteração 2: Ajustar o tamanho do canvas dinamicamente com base na largura da tela
-        const baseWidth = 600; // Largura base do canvas
-        const baseHeight = 300; // Altura base do canvas
-        let scaleFactor = Math.min(window.innerWidth / baseWidth, 1); // Fator de escala baseado na largura da tela
-        canvas.width = baseWidth * scaleFactor; // Ajustar a largura do canvas
-        canvas.height = baseHeight * scaleFactor; // Ajustar a altura do canvas para manter a proporção
+        // Alteração 1: Reduzir o tamanho base para dispositivos móveis e ajustar o scaleFactor
+        const baseWidth = 400; // Reduzido de 600 para 400
+        const baseHeight = 200; // Reduzido de 300 para 200
+        let scaleFactor = Math.min(window.innerWidth / baseWidth, 1) / (window.devicePixelRatio || 1); // Ajustar pelo devicePixelRatio
+        canvas.width = baseWidth * scaleFactor;
+        canvas.height = baseHeight * scaleFactor;
+
+        // Alteração 2: Ajustar as dimensões CSS do canvas para corresponder às dimensões lógicas
+        canvas.style.width = `${canvas.width}px`;
+        canvas.style.height = `${canvas.height}px`;
 
         const ctx = canvas.getContext("2d");
 
@@ -107,7 +110,7 @@
             width: 40 * scaleFactor, 
             height: 40 * scaleFactor, 
             dy: 0, 
-            gravity: 0.5, 
+            gravity: 0.5 * scaleFactor, // Ajustar a gravidade
             jump: -12 * scaleFactor, 
             onGround: true 
         };
@@ -139,7 +142,7 @@
                 width: 40 * scaleFactor, 
                 height: 40 * scaleFactor, 
                 dy: 0, 
-                gravity: 0.5, 
+                gravity: 0.5 * scaleFactor, 
                 jump: -12 * scaleFactor, 
                 onGround: true 
             };
@@ -159,8 +162,7 @@
         }
 
         function createObstacle() {
-            let obstacleSpeed = (3 + (score / 100)) * scaleFactor; // Ajustar a velocidade com base no scaleFactor
-            // Alteração 5: Ajustar o tamanho e a posição dos obstáculos com base no scaleFactor
+            let obstacleSpeed = (3 + (score / 100)) * scaleFactor;
             obstacles.push({ 
                 x: canvas.width, 
                 y: canvas.height - 50 * scaleFactor, 
@@ -171,7 +173,6 @@
         }
 
         function createCloud() {
-            // Alteração 6: Ajustar o tamanho e a posição das nuvens com base no scaleFactor
             clouds.push({ 
                 x: canvas.width, 
                 y: (Math.random() * 80 + 30) * scaleFactor, 
@@ -215,7 +216,6 @@
         function update() {
             if (gameOver) {
                 ctx.fillStyle = "#ff0000";
-                // Alteração 7: Ajustar o tamanho da fonte para o "Game Over" com base no scaleFactor
                 ctx.font = `${36 * scaleFactor}px Nunito`;
                 ctx.textAlign = "center";
                 ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 15 * scaleFactor);
@@ -231,15 +231,12 @@
 
             canvas.style.backgroundColor = "#ffffff";
 
-            // Alteração 8: Ajustar a posição do chão com base no scaleFactor
             ctx.fillStyle = "#999999";
             ctx.fillRect(0, canvas.height - 40 * scaleFactor, canvas.width, 2);
 
-            // Aplicar gravidade e atualizar posição
             dino.dy += dino.gravity;
             dino.y += dino.dy;
 
-            // Alteração 9: Ajustar a verificação do chão
             if (dino.y >= canvas.height - dino.height) {
                 dino.y = canvas.height - dino.height;
                 dino.dy = 0;
@@ -272,7 +269,6 @@
             frame++;
             score = Math.floor(frame / 10);
 
-            // Alteração 10: Ajustar o tamanho da fonte para a pontuação e recorde com base no scaleFactor
             ctx.fillStyle = "#333333";
             ctx.font = `${18 * scaleFactor}px Nunito`;
             ctx.textAlign = "center";
@@ -282,14 +278,8 @@
             requestAnimationFrame(update);
         }
 
-        document.addEventListener("keydown", (e) => {
-            if (e.code === "Space" && dino.onGround && !gameOver) {
-                dino.dy = dino.jump;
-                jumpSound.play();
-            }
-        });
-
-        document.addEventListener("touchstart", (e) => {
+        // Alteração 5: Adicionar evento de toque diretamente no canvas
+        canvas.addEventListener("touchstart", (e) => {
             if (dino.onGround && !gameOver) {
                 dino.dy = dino.jump;
                 jumpSound.play();
@@ -297,28 +287,54 @@
             e.preventDefault();
         });
 
-        // Alteração 11: Ajustar o canvas quando a janela for redimensionada
-        window.addEventListener("resize", () => {
-            scaleFactor = Math.min(window.innerWidth / baseWidth, 1);
-            canvas.width = baseWidth * scaleFactor;
-            canvas.height = baseHeight * scaleFactor;
-            resetGame(); // Reiniciar o jogo para ajustar os elementos ao novo tamanho
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && dino.onGround && !gameOver) {
+                dino.dy = dino.jump;
+                jumpSound.play();
+            }
         });
 
-        dinoImage.onload = function() {
-            cactusImage.onload = function() {
-                cloudImage.onload = function() {
-                    backgroundMusic.play();
-                    update();
-                };
-            };
-        };
+        // Alteração 6: Ajustar o canvas quando a janela for redimensionada
+        window.addEventListener("resize", () => {
+            scaleFactor = Math.min(window.innerWidth / baseWidth, 1) / (window.devicePixelRatio || 1);
+            canvas.width = baseWidth * scaleFactor;
+            canvas.height = baseHeight * scaleFactor;
+            canvas.style.width = `${canvas.width}px`;
+            canvas.style.height = `${canvas.height}px`;
+            resetGame();
+        });
+
+        // Alteração 7: Adicionar verificação de carregamento de imagens
+        let imagesLoaded = 0;
+        const totalImages = 3;
+
+        function checkAllImagesLoaded() {
+            imagesLoaded++;
+            if (imagesLoaded === totalImages) {
+                backgroundMusic.play();
+                update();
+            }
+        }
+
+        dinoImage.onload = checkAllImagesLoaded;
+        cactusImage.onload = checkAllImagesLoaded;
+        cloudImage.onload = checkAllImagesLoaded;
 
         dinoImage.onerror = () => {
             console.log("Imagem do dino não carregou");
             ctx.fillStyle = "green";
             ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
-            update();
+            checkAllImagesLoaded();
+        };
+
+        cactusImage.onerror = () => {
+            console.log("Imagem do cacto não carregou");
+            checkAllImagesLoaded();
+        };
+
+        cloudImage.onerror = () => {
+            console.log("Imagem da nuvem não carregou");
+            checkAllImagesLoaded();
         };
     </script>
 </body>
