@@ -28,8 +28,9 @@
         }
 
         canvas {
-            display: block; /* Para eliminar qualquer espaço indesejado */
+            display: block;
             background-color: #ffffff;
+            border: 2px solid #333333; /* Adicionado: Borda para destacar o canvas */
         }
 
         .botao-grande {
@@ -70,7 +71,7 @@
                 height: 150px;
                 font-size: 20px;
             }
-        }
+ W       }
     </style>
 </head>
 <body>
@@ -87,21 +88,22 @@
         const restartButton = document.getElementById("restartButton");
         const backgroundMusic = document.getElementById("backgroundMusic");
         
-        // Atualizando o tamanho do canvas para ocupar toda a tela
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Alteração 1: Reduzir o tamanho do canvas
+        canvas.width = 800;  // Alterado de window.innerWidth para 800
+        canvas.height = 400; // Alterado de window.innerHeight para 400
 
         const ctx = canvas.getContext("2d");
 
+        // Alteração 2: Ajustar a posição inicial do dinossauro para o novo tamanho do canvas
         let dino = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
         let dinoImage = new Image();
-        dinoImage.src = "https://cdn-icons-png.flaticon.com/128/14448/14448602.png"; // Imagem do dinossauro
+        dinoImage.src = "https://cdn-icons-png.flaticon.com/128/14448/14448602.png";
 
         let cactusImage = new Image();
-        cactusImage.src = "https://media.istockphoto.com/id/2182088033/pt/vetorial/ghost-icon.jpg?s=1024x1024&w=is&k=20&c=On4zXpB1AN_2yyNQGUmOAHZJPKZz8u-Sy2ZZHb0HeFU="; // Imagem do cacto
+        cactusImage.src = "https://media.istockphoto.com/id/2182088033/pt/vetorial/ghost-icon.jpg?s=1024x1024&w=is&k=20&c=On4zXpB1AN_2yyNQGUmOAHZJPKZz8u-Sy2ZZHb0HeFU=";
 
         let cloudImage = new Image();
-        cloudImage.src = "https://cdn-icons-png.flaticon.com/128/3989/3989725.png"; // Imagem de nuvem
+        cloudImage.src = "https://cdn-icons-png.flaticon.com/128/3989/3989725.png";
 
         let obstacles = [];
         let clouds = [];
@@ -110,10 +112,11 @@
         let highScore = localStorage.getItem("highScore") || 0;
         let gameOver = false;
 
-        const jumpSound = new Audio("jump-sound.mp3"); // Ajuste o caminho se necessário
-        const crashSound = new Audio("crash-sound.mp3"); // Ajuste o caminho se necessário
+        const jumpSound = new Audio("jump-sound.mp3");
+        const crashSound = new Audio("crash-sound.mp3");
 
         function resetGame() {
+            // Alteração 3: Ajustar a posição inicial do dinossauro no reset para o novo tamanho do canvas
             dino = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
             obstacles = [];
             clouds = [];
@@ -132,10 +135,12 @@
 
         function createObstacle() {
             let obstacleSpeed = 3 + (score / 100);
+            // Alteração 4: Ajustar a posição dos obstáculos para o novo tamanho do canvas
             obstacles.push({ x: canvas.width, y: canvas.height - 60, width: 40, height: 60, speed: obstacleSpeed });
         }
 
         function createCloud() {
+            // Alteração 5: Ajustar a posição das nuvens para o novo tamanho do canvas
             clouds.push({ x: canvas.width, y: Math.random() * 100 + 50, width: 80, height: 40, speed: 1 });
         }
 
@@ -186,9 +191,9 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // A cor de fundo sempre será branca
             canvas.style.backgroundColor = "#ffffff";
 
+            // Alteração 6: Ajustar a posição do chão para o novo tamanho do canvas
             ctx.fillStyle = "#999999";
             ctx.fillRect(0, canvas.height - 50, canvas.width, 2);
 
@@ -196,7 +201,7 @@
             dino.dy += dino.gravity;
             dino.y += dino.dy;
 
-            // Verificar se o dino está no chão
+            // Alteração 7: Ajustar a verificação do chão para o novo tamanho do canvas
             if (dino.y >= canvas.height - dino.height) {
                 dino.y = canvas.height - dino.height;
                 dino.dy = 0;
@@ -205,7 +210,6 @@
                 dino.onGround = false;
             }
 
-            // Limitar o topo do canvas
             if (dino.y < 0) {
                 dino.y = 0;
                 dino.dy = 0;
