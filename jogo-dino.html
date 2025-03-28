@@ -30,7 +30,7 @@
         canvas {
             display: block;
             background-color: #ffffff;
-            border: 2px solid #333333; /* Adicionado: Borda para destacar o canvas */
+            border: 2px solid #333333;
         }
 
         .botao-grande {
@@ -71,7 +71,7 @@
                 height: 150px;
                 font-size: 20px;
             }
- W       }
+        }
     </style>
 </head>
 <body>
@@ -88,14 +88,18 @@
         const restartButton = document.getElementById("restartButton");
         const backgroundMusic = document.getElementById("backgroundMusic");
         
-        // Alteração 1: Reduzir o tamanho do canvas
-        canvas.width = 800;  // Alterado de window.innerWidth para 800
-        canvas.height = 400; // Alterado de window.innerHeight para 400
+        // Alteração 1: Ajustar o tamanho do canvas para um valor mais compacto
+        canvas.width = 600;  // Alterado de 800 para 600
+        canvas.height = 300; // Alterado de 400 para 300
 
         const ctx = canvas.getContext("2d");
 
-        // Alteração 2: Ajustar a posição inicial do dinossauro para o novo tamanho do canvas
-        let dino = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
+        // Alteração 2: Ajustar o tamanho e a posição inicial do dinossauro
+        let dino = { x: 40, y: canvas.height - 80, width: 40, height: 40, dy: 0, gravity: 0.5, jump: -12, onGround: true };
+        // Reduzido width e height de 50 para 40
+        // Ajustado y para canvas.height - 80 (proporcional ao novo chão e ao novo tamanho do dino)
+        // Ajustado jump de -15 para -12 para um pulo proporcional ao canvas menor
+
         let dinoImage = new Image();
         dinoImage.src = "https://cdn-icons-png.flaticon.com/128/14448/14448602.png";
 
@@ -116,8 +120,8 @@
         const crashSound = new Audio("crash-sound.mp3");
 
         function resetGame() {
-            // Alteração 3: Ajustar a posição inicial do dinossauro no reset para o novo tamanho do canvas
-            dino = { x: 50, y: canvas.height - 100, width: 50, height: 50, dy: 0, gravity: 0.5, jump: -15, onGround: true };
+            // Alteração 3: Ajustar a posição inicial do dinossauro no reset
+            dino = { x: 40, y: canvas.height - 80, width: 40, height: 40, dy: 0, gravity: 0.5, jump: -12, onGround: true };
             obstacles = [];
             clouds = [];
             frame = 0;
@@ -135,13 +139,17 @@
 
         function createObstacle() {
             let obstacleSpeed = 3 + (score / 100);
-            // Alteração 4: Ajustar a posição dos obstáculos para o novo tamanho do canvas
-            obstacles.push({ x: canvas.width, y: canvas.height - 60, width: 40, height: 60, speed: obstacleSpeed });
+            // Alteração 4: Ajustar o tamanho e a posição dos obstáculos
+            obstacles.push({ x: canvas.width, y: canvas.height - 50, width: 30, height: 50, speed: obstacleSpeed });
+            // Reduzido width de 40 para 30 e height de 60 para 50
+            // Ajustado y para canvas.height - 50 (novo chão)
         }
 
         function createCloud() {
-            // Alteração 5: Ajustar a posição das nuvens para o novo tamanho do canvas
-            clouds.push({ x: canvas.width, y: Math.random() * 100 + 50, width: 80, height: 40, speed: 1 });
+            // Alteração 5: Ajustar o tamanho e a posição das nuvens
+            clouds.push({ x: canvas.width, y: Math.random() * 80 + 30, width: 60, height: 30, speed: 1 });
+            // Reduzido width de 80 para 60 e height de 40 para 30
+            // Ajustado o intervalo de y para Math.random() * 80 + 30 (proporcional ao novo canvas.height)
         }
 
         function drawObstacles() {
@@ -178,12 +186,13 @@
         function update() {
             if (gameOver) {
                 ctx.fillStyle = "#ff0000";
-                ctx.font = "48px Nunito";
+                // Alteração 6: Ajustar o tamanho da fonte para o "Game Over"
+                ctx.font = "36px Nunito"; // Reduzido de 48px para 36px
                 ctx.textAlign = "center";
-                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
-                ctx.font = "24px Nunito";
-                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
-                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
+                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 15);
+                ctx.font = "18px Nunito"; // Reduzido de 24px para 18px
+                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 15);
+                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 40);
                 restartButton.style.display = "inline-flex";
                 backgroundMusic.pause();
                 return;
@@ -193,15 +202,15 @@
 
             canvas.style.backgroundColor = "#ffffff";
 
-            // Alteração 6: Ajustar a posição do chão para o novo tamanho do canvas
+            // Alteração 7: Ajustar a posição do chão
             ctx.fillStyle = "#999999";
-            ctx.fillRect(0, canvas.height - 50, canvas.width, 2);
+            ctx.fillRect(0, canvas.height - 40, canvas.width, 2); // Ajustado de canvas.height - 50 para canvas.height - 40
 
             // Aplicar gravidade e atualizar posição
             dino.dy += dino.gravity;
             dino.y += dino.dy;
 
-            // Alteração 7: Ajustar a verificação do chão para o novo tamanho do canvas
+            // Alteração 8: Ajustar a verificação do chão
             if (dino.y >= canvas.height - dino.height) {
                 dino.y = canvas.height - dino.height;
                 dino.dy = 0;
@@ -234,11 +243,12 @@
             frame++;
             score = Math.floor(frame / 10);
 
+            // Alteração 9: Ajustar o tamanho da fonte para a pontuação e recorde
             ctx.fillStyle = "#333333";
-            ctx.font = "24px Nunito";
+            ctx.font = "18px Nunito"; // Reduzido de 24px para 18px
             ctx.textAlign = "center";
-            ctx.fillText("Pontuação: " + score, canvas.width / 2, 30);
-            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 60);
+            ctx.fillText("Pontuação: " + score, canvas.width / 2, 25); // Ajustado de 30 para 25
+            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 50); // Ajustado de 60 para 50
 
             requestAnimationFrame(update);
         }
