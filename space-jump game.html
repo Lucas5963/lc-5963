@@ -31,7 +31,8 @@
             background-color: #16213e; 
             margin-bottom: 20px; 
         }
-        .botao-grande { 
+        .botao-grande {
+
             width: 200px; 
             height: 200px; 
             display: inline-flex; 
@@ -117,7 +118,7 @@
         const canvas = document.getElementById("gameCanvas");
         const restartButton = document.getElementById("restartButton");
         const backgroundMusic = document.getElementById("backgroundMusic");
-        
+
         // Definir o tamanho do canvas igual ao "Jogo do Astronauta"
         canvas.width = Math.min(window.innerWidth - 40, 1200);
         canvas.height = 400;
@@ -207,7 +208,15 @@
                     createPlatform();
                     continue;
                 }
+
+                // Adiciona um efeito neon ao redor da plataforma
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "#00ffcc";
                 ctx.drawImage(platformImage, platform.x, platformY, platform.width, platform.height);
+
+                // Reseta a sombra
+                ctx.shadowBlur = 0;
+                ctx.shadowColor = "transparent";
             }
         }
 
