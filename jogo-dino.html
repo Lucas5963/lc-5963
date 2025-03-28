@@ -90,28 +90,21 @@
         const restartButton = document.getElementById("restartButton");
         const backgroundMusic = document.getElementById("backgroundMusic");
         
-        // Alteração 1: Reduzir o tamanho base para dispositivos móveis e ajustar o scaleFactor
-        const baseWidth = 400; // Reduzido de 600 para 400
-        const baseHeight = 200; // Reduzido de 300 para 200
-        let scaleFactor = Math.min(window.innerWidth / baseWidth, 1) / (window.devicePixelRatio || 1); // Ajustar pelo devicePixelRatio
-        canvas.width = baseWidth * scaleFactor;
-        canvas.height = baseHeight * scaleFactor;
-
-        // Alteração 2: Ajustar as dimensões CSS do canvas para corresponder às dimensões lógicas
-        canvas.style.width = `${canvas.width}px`;
-        canvas.style.height = `${canvas.height}px`;
+        // Alteração 1: Ajustar o tamanho do canvas para o mesmo do "Jogo do Astronauta"
+        canvas.width = Math.min(window.innerWidth - 40, 1200); // Mesmo tamanho do "Jogo do Astronauta"
+        canvas.height = 400; // Mesmo tamanho do "Jogo do Astronauta"
 
         const ctx = canvas.getContext("2d");
 
-        // Alteração 3: Ajustar o tamanho e a posição inicial do dinossauro com base no scaleFactor
+        // Alteração 2: Ajustar o tamanho e a posição inicial do dinossauro para o novo canvas
         let dino = { 
-            x: 40 * scaleFactor, 
-            y: (canvas.height - 80 * scaleFactor), 
-            width: 40 * scaleFactor, 
-            height: 40 * scaleFactor, 
+            x: 50, 
+            y: canvas.height - 100, 
+            width: 50, 
+            height: 50, 
             dy: 0, 
-            gravity: 0.5 * scaleFactor, // Ajustar a gravidade
-            jump: -12 * scaleFactor, 
+            gravity: 0.5, 
+            jump: -15, 
             onGround: true 
         };
 
@@ -135,15 +128,15 @@
         const crashSound = new Audio("crash-sound.mp3");
 
         function resetGame() {
-            // Alteração 4: Ajustar a posição inicial do dinossauro no reset com base no scaleFactor
+            // Alteração 3: Ajustar a posição inicial do dinossauro no reset
             dino = { 
-                x: 40 * scaleFactor, 
-                y: (canvas.height - 80 * scaleFactor), 
-                width: 40 * scaleFactor, 
-                height: 40 * scaleFactor, 
+                x: 50, 
+                y: canvas.height - 100, 
+                width: 50, 
+                height: 50, 
                 dy: 0, 
-                gravity: 0.5 * scaleFactor, 
-                jump: -12 * scaleFactor, 
+                gravity: 0.5, 
+                jump: -15, 
                 onGround: true 
             };
             obstacles = [];
@@ -162,23 +155,25 @@
         }
 
         function createObstacle() {
-            let obstacleSpeed = (3 + (score / 100)) * scaleFactor;
+            let obstacleSpeed = 3 + (score / 100);
+            // Alteração 4: Ajustar o tamanho e a posição dos obstáculos
             obstacles.push({ 
                 x: canvas.width, 
-                y: canvas.height - 50 * scaleFactor, 
-                width: 30 * scaleFactor, 
-                height: 50 * scaleFactor, 
+                y: canvas.height - 60, 
+                width: 40, 
+                height: 60, 
                 speed: obstacleSpeed 
             });
         }
 
         function createCloud() {
+            // Alteração 5: Ajustar o tamanho e a posição das nuvens
             clouds.push({ 
                 x: canvas.width, 
-                y: (Math.random() * 80 + 30) * scaleFactor, 
-                width: 60 * scaleFactor, 
-                height: 30 * scaleFactor, 
-                speed: 1 * scaleFactor 
+                y: Math.random() * 100 + 50, 
+                width: 80, 
+                height: 40, 
+                speed: 1 
             });
         }
 
@@ -216,12 +211,13 @@
         function update() {
             if (gameOver) {
                 ctx.fillStyle = "#ff0000";
-                ctx.font = `${36 * scaleFactor}px Nunito`;
+                // Alteração 6: Ajustar o tamanho da fonte para o "Game Over"
+                ctx.font = "48px Nunito";
                 ctx.textAlign = "center";
-                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 15 * scaleFactor);
-                ctx.font = `${18 * scaleFactor}px Nunito`;
-                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 15 * scaleFactor);
-                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 40 * scaleFactor);
+                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = "24px Nunito";
+                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
                 restartButton.style.display = "inline-flex";
                 backgroundMusic.pause();
                 return;
@@ -231,8 +227,9 @@
 
             canvas.style.backgroundColor = "#ffffff";
 
+            // Alteração 7: Ajustar a posição do chão
             ctx.fillStyle = "#999999";
-            ctx.fillRect(0, canvas.height - 40 * scaleFactor, canvas.width, 2);
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 2);
 
             dino.dy += dino.gravity;
             dino.y += dino.dy;
@@ -269,17 +266,18 @@
             frame++;
             score = Math.floor(frame / 10);
 
+            // Alteração 8: Ajustar o tamanho da fonte para a pontuação e recorde
             ctx.fillStyle = "#333333";
-            ctx.font = `${18 * scaleFactor}px Nunito`;
+            ctx.font = "24px Nunito";
             ctx.textAlign = "center";
-            ctx.fillText("Pontuação: " + score, canvas.width / 2, 25 * scaleFactor);
-            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 50 * scaleFactor);
+            ctx.fillText("Pontuação: " + score, canvas.width / 2, 30);
+            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 60);
 
             requestAnimationFrame(update);
         }
 
-        // Alteração 5: Adicionar evento de toque diretamente no canvas
-        canvas.addEventListener("touchstart", (e) => {
+        // Alteração 9: Ajustar o evento de toque para o mesmo formato do "Jogo do Astronauta"
+        document.addEventListener("touchstart", (e) => {
             if (dino.onGround && !gameOver) {
                 dino.dy = dino.jump;
                 jumpSound.play();
@@ -294,17 +292,13 @@
             }
         });
 
-        // Alteração 6: Ajustar o canvas quando a janela for redimensionada
+        // Alteração 10: Ajustar o redimensionamento do canvas
         window.addEventListener("resize", () => {
-            scaleFactor = Math.min(window.innerWidth / baseWidth, 1) / (window.devicePixelRatio || 1);
-            canvas.width = baseWidth * scaleFactor;
-            canvas.height = baseHeight * scaleFactor;
-            canvas.style.width = `${canvas.width}px`;
-            canvas.style.height = `${canvas.height}px`;
+            canvas.width = Math.min(window.innerWidth - 40, 1200);
+            canvas.height = 400;
             resetGame();
         });
 
-        // Alteração 7: Adicionar verificação de carregamento de imagens
         let imagesLoaded = 0;
         const totalImages = 3;
 
