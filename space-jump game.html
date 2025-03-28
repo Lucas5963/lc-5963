@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Jump Espacial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #1a1a2e; 
+            font-family: 'Nunito', sans-serif; 
+        }
+        h1 { 
+            color: #e94560; 
+            font-size: 36px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.3px; 
+            font-weight: 700; 
+            margin-bottom: 20px; 
+        }
+        canvas { 
+            border: 6px solid #0f3460; 
+            border-radius: 10px; 
+            box-shadow: 12px 12px 24px rgba(233, 69, 96, 0.64); 
+            background-color: #16213e; 
+            margin-bottom: 20px; 
+        }
+        .botao-grande { 
+            width: 200px; 
+            height: 200px; 
+            display: inline-flex; 
+            font-family: 'Nunito', sans-serif; 
+            font-size: 24px; 
+            align-items: center; 
+            justify-content: center; 
+            text-transform: uppercase; 
+            text-align: center; 
+            letter-spacing: 1.3px; 
+            font-weight: 700; 
+            color: white; 
+            background: linear-gradient(90deg, #e94560 0%, #0f3460 100%); 
+            border: none; 
+            border-radius: 1000px; 
+            box-shadow: 12px 12px 24px rgba(233, 69, 96, 0.64); 
+            transition: all 0.3s ease-in-out 0s; 
+            cursor: pointer; 
+            outline: none; 
+            position: relative; 
+        }
+        .botao-grande::before { 
+            content: ''; 
+            border-radius: 1000px; 
+            width: calc(200px + 12px); 
+            height: calc(200px + 12px); 
+            border: 6px solid #e94560; 
+            box-shadow: 0 0 60px rgba(233, 69, 96, 0.64); 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            opacity: 0; 
+            transition: all 0.3s ease-in-out 0s; 
+        }
+        .botao-grande:hover, .botao-grande:focus { 
+            color: white; 
+            transform: translateY(-6px); 
+            background: linear-gradient(90deg, #0f3460 0%, #e94560 100%); 
+        }
+        .botao-grande:hover::before, .botao-grande:focus::before { 
+            opacity: 1; 
+        }
+        .botao-grande::after { 
+            content: ''; 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 100%; 
+            border: 6px solid #e94560; 
+            position: absolute; 
+            z-index: -1; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            animation: ring 1.5s infinite; 
+        }
+        .botao-grande:hover::after, .botao-grande:focus::after { 
+            animation: none; 
+            display: none; 
+        }
+        @keyframes ring { 
+            0% { width: 30px; height: 30px; opacity: 1; } 
+            100% { width: 200px; height: 200px; opacity: 0; } 
+        }
+        @media (max-width: 600px) {
+            canvas { border: 4px solid #0f3460; box-shadow: 6px 6px 12px rgba(233, 69, 96, 0.64); }
+            h1 { font-size: 24px; margin-bottom: 10px; }
+            .botao-grande { width: 150px; height: 150px; font-size: 20px; }
+            .botao-grande::before { width: calc(150px + 12px); height: calc(150px + 12px); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Doodle Jump Espacial</h1>
+    <canvas id="gameCanvas"></canvas>
+    <button class="botao-grande" id="restartButton" style="display: none;" onclick="resetGame()">Reiniciar</button>
+    <audio id="backgroundMusic" loop>
+        <source src="https://raw.githubusercontent.com/Lucas5963/lc-5963/main/background-music.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const restartButton = document.getElementById("restartButton");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        
+        // Definir o tamanho do canvas igual ao "Jogo do Astronauta"
+        canvas.width = Math.min(window.innerWidth - 40, 1200);
+        canvas.height = 400;
+
+        const ctx = canvas.getContext("2d");
+
+        // Definir o astronauta (personagem principal)
+        let astronaut = { 
+            x: canvas.width / 2, 
+            y: canvas.height - 50, 
+            width: 50, 
+            height: 50, 
+            dx: 0, 
+            dy: -10, 
+            gravity: 0.3, 
+            jumpForce: -10, 
+            maxSpeed: 5 
+        };
+
+        let astronautImage = new Image();
+        astronautImage.src = "https://cdn-icons-png.flaticon.com/128/6989/6989363.png"; // Imagem de astronauta
+
+        let platformImage = new Image();
+        platformImage.src = "https://cdn-icons-png.flaticon.com/128/188/188318.png"; // Imagem de plataforma (estrela)
+
+        let platforms = [];
+        let cameraY = 0; // Posição da câmera para rolagem vertical
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+        let gameOver = false;
+
+        const jumpSound = new Audio("jump-sound.mp3");
+        const crashSound = new Audio("crash-sound.mp3");
+
+        // Inicializar plataformas
+        function initPlatforms() {
+            platforms = [];
+            // Plataforma inicial
+            platforms.push({ x: canvas.width / 2 - 50, y: canvas.height - 50, width: 100, height: 20 });
+            // Gerar plataformas iniciais
+            for (let i = 0; i < 10; i++) {
+                createPlatform();
+            }
+        }
+
+        function createPlatform() {
+            const minGap = 50;
+            const maxGap = 150;
+            const lastPlatform = platforms[platforms.length - 1];
+            const y = lastPlatform ? lastPlatform.y - (minGap + Math.random() * (maxGap - minGap)) : canvas.height - 100;
+            const x = Math.random() * (canvas.width - 100);
+            platforms.push({ x: x, y: y, width: 100, height: 20 });
+        }
+
+        function resetGame() {
+            astronaut = { 
+                x: canvas.width / 2, 
+                y: canvas.height - 50, 
+                width: 50, 
+                height: 50, 
+                dx: 0, 
+                dy: -10, 
+                gravity: 0.3, 
+                jumpForce: -10, 
+                maxSpeed: 5 
+            };
+            cameraY = 0;
+            score = 0;
+            initPlatforms();
+            gameOver = false;
+            restartButton.style.display = "none";
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play();
+            update();
+        }
+
+        function drawAstronaut() {
+            ctx.drawImage(astronautImage, astronaut.x, astronaut.y - cameraY, astronaut.width, astronaut.height);
+        }
+
+        function drawPlatforms() {
+            for (let i = platforms.length - 1; i >= 0; i--) {
+                const platform = platforms[i];
+                const platformY = platform.y - cameraY;
+                if (platformY > canvas.height) {
+                    platforms.splice(i, 1);
+                    createPlatform();
+                    continue;
+                }
+                ctx.drawImage(platformImage, platform.x, platformY, platform.width, platform.height);
+            }
+        }
+
+        function checkCollision() {
+            for (let platform of platforms) {
+                if (astronaut.dy > 0 && // Caindo
+                    astronaut.x + astronaut.width > platform.x &&
+                    astronaut.x < platform.x + platform.width &&
+                    astronaut.y + astronaut.height > platform.y &&
+                    astronaut.y + astronaut.height < platform.y + platform.height) {
+                    astronaut.dy = astronaut.jumpForce;
+                    jumpSound.play();
+                }
+            }
+        }
+
+        function update() {
+            if (gameOver) {
+                ctx.fillStyle = "#e94560";
+                ctx.font = "48px Nunito";
+                ctx.textAlign = "center";
+                ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = "24px Nunito";
+                ctx.fillText("Pontuação: " + score, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText("Recorde: " + highScore, canvas.width / 2, canvas.height / 2 + 50);
+                restartButton.style.display = "inline-flex";
+                backgroundMusic.pause();
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Atualizar a posição do astronauta
+            astronaut.dy += astronaut.gravity;
+            astronaut.y += astronaut.dy;
+            astronaut.x += astronaut.dx;
+
+            // Limites horizontais (o astronauta "enrola" na tela)
+            if (astronaut.x + astronaut.width < 0) astronaut.x = canvas.width;
+            if (astronaut.x > canvas.width) astronaut.x = -astronaut.width;
+
+            // Atualizar a câmera
+            if (astronaut.y - cameraY < canvas.height / 3) {
+                cameraY = astronaut.y - canvas.height / 3;
+            }
+
+            // Atualizar a pontuação
+            score = Math.max(score, Math.floor(-cameraY / 10));
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem("highScore", highScore);
+            }
+
+            // Verificar se o astronauta caiu
+            if (astronaut.y - cameraY > canvas.height) {
+                gameOver = true;
+                crashSound.play();
+            }
+
+            checkCollision();
+            drawPlatforms();
+            drawAstronaut();
+
+            // Desenhar a pontuação
+            ctx.fillStyle = "#e94560";
+            ctx.font = "24px Nunito";
+            ctx.textAlign = "center";
+            ctx.fillText("Pontuação: " + score, canvas.width / 2, 30);
+            ctx.fillText("Recorde: " + highScore, canvas.width / 2, 60);
+
+            requestAnimationFrame(update);
+        }
+
+        // Controles para desktop (setas esquerda/direita)
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "ArrowLeft") {
+                astronaut.dx = -astronaut.maxSpeed;
+            } else if (e.code === "ArrowRight") {
+                astronaut.dx = astronaut.maxSpeed;
+            }
+        });
+
+        document.addEventListener("keyup", (e) => {
+            if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+                astronaut.dx = 0;
+            }
+        });
+
+        // Controles para dispositivos móveis (toque)
+        let touchStartX = null;
+        document.addEventListener("touchstart", (e) => {
+            touchStartX = e.touches[0].clientX;
+            e.preventDefault();
+        });
+
+        document.addEventListener("touchmove", (e) => {
+            if (touchStartX !== null) {
+                const touchX = e.touches[0].clientX;
+                const deltaX = touchX - touchStartX;
+                astronaut.dx = (deltaX / 50) * astronaut.maxSpeed;
+                astronaut.dx = Math.max(-astronaut.maxSpeed, Math.min(astronaut.maxSpeed, astronaut.dx));
+            }
+            e.preventDefault();
+        });
+
+        document.addEventListener("touchend", () => {
+            touchStartX = null;
+            astronaut.dx = 0;
+        });
+
+        // Redimensionar o canvas
+        window.addEventListener("resize", () => {
+            canvas.width = Math.min(window.innerWidth - 40, 1200);
+            canvas.height = 400;
+            resetGame();
+        });
+
+        // Carregar imagens
+        let imagesLoaded = 0;
+        const totalImages = 2;
+
+        function checkAllImagesLoaded() {
+            imagesLoaded++;
+            if (imagesLoaded === totalImages) {
+                initPlatforms();
+                backgroundMusic.play();
+                update();
+            }
+        }
+
+        astronautImage.onload = checkAllImagesLoaded;
+        platformImage.onload = checkAllImagesLoaded;
+
+        astronautImage.onerror = () => {
+            console.log("Imagem do astronauta não carregou");
+            ctx.fillStyle = "white";
+            ctx.fillRect(astronaut.x, astronaut.y - cameraY, astronaut.width, astronaut.height);
+            checkAllImagesLoaded();
+        };
+
+        platformImage.onerror = () => {
+            console.log("Imagem da plataforma não carregou");
+            checkAllImagesLoaded();
+        };
+    </script>
+</body>
+</html>
